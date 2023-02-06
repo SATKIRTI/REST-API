@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON-TO-CSV</title>
+</head>
+<body>
+    <h1>JSON to CSV file download</h1>
+    <button id="btn">Start Download</button>
+</body>
+
+<script>
+
+fetch('https://reqres.in/api/users')
+    .then(res => res.json())
+    .then(obj => handle(obj))
+    
+function handle(obj) {
+
+    const headers = Object.keys(obj.data[0]).toString();
+
+    const main = obj.data.map((item) => {
+
+        return Object.values(item).toString();
+
+    });
+
+    const csv = [headers, ...main].join('\n');
+
+    startCSVDownload(csv);
+
+}
+
+function startCSVDownload(input) {
+
+    const blob = new Blob([input], { type: 'application/csv' });
+    // Creates new CSV blob (a file)
+
+    const url = URL.createObjectURL(blob);
+    // Creates a temporary URL to the blob in the brwoser
+
+
+    document.getElementById('btn').addEventListener('click', () => {
+    // When the button is clicked...
+
+        const a = document.createElement('a');
+        a.download = 'users.csv';
+        a.href = url;
+        a.style.display = 'none';
+        //... Set temporary URL as href of anchor element...
+
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        //...insert in DOM, simulate a click and remove....
+
+        URL.revokeObjectURL(url);
+        //...remove URL (also remove linked file from browser memory)
+
+    })
+}
+</script>
+
+</body>
+</html>
